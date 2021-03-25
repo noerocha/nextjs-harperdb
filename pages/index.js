@@ -1,7 +1,33 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import Link from "next/link";
+import styles from "../styles/Home.module.css";
 
-export default function Home() {
+import { harperFetch } from "../utils/harperdb";
+
+export default function Home({ dogs }) {
+  const addDog = async () => {
+    try {
+      const body = {
+        operation: "insert",
+        schema: "dev",
+        table: "dog",
+        records: [
+          {
+            dog_name: "Max",
+            owner_name: "Anne",
+            breed_id: 154,
+            age: 15,
+            weight_lbs: 35,
+            adorable: true,
+          },
+        ],
+      };
+
+      await harperFetch(body);
+    } catch (e) {
+      console.log(error.message);
+    }
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -11,42 +37,17 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Welcome to <a href="https://nextjs.org">Harper DB!</a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <button onClick={addDog}>Add dog</button>
 
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+          {dogs.map((dog) => (
+            <Link href={`/dog/${dog.id}`} key={dog.id}>
+              <a className={styles.card}>{dog.dog_name}</a>
+            </Link>
+          ))}
         </div>
       </main>
 
@@ -56,10 +57,24 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
         </a>
       </footer>
     </div>
-  )
+  );
+}
+
+export async function getStaticProps() {
+  const body = {
+    operation: "sql",
+    sql: "SELECT * FROM dev.dog",
+  };
+  const dogs = await harperFetch(body);
+
+  return {
+    props: {
+      dogs,
+    },
+  };
 }
