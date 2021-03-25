@@ -2,6 +2,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+Before running the app, create a .env.local file and provide your own HARPER DB credentials for the variables: 
+HARPERDB_URL and HARPERDB_SECRET
+
 First, run the development server:
 
 ```bash
